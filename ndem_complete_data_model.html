@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDEM Data Model - Complete Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .header .info {
+            font-size: 0.95em;
+            opacity: 0.85;
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .nav-bar {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            sticky: position;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 700;
+        }
+
+        .class-hierarchy {
+            background: #f0f2ff;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .class-card:hover {
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .class-card.entity {
+            border-left-color: #764ba2;
+        }
+
+        .class-card.composition {
+            border-left-color: #e74c3c;
+        }
+
+        .class-card.core {
+            border-left-color: #27ae60;
+        }
+
+        .class-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .class-stereotype {
+            font-size: 0.85em;
+            color: #999;
+            font-style: italic;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 15px;
+        }
+
+        .class-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .attributes-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .attributes-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .attribute {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+            display: grid;
+            grid-template-columns: 180px 1fr 120px;
+            gap: 15px;
+            font-size: 0.9em;
+            align-items: center;
+        }
+
+        .attr-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .attr-type {
+            color: #555;
+        }
+
+        .attr-card {
+            background: #e8ebff;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .relationships-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .relationship {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #764ba2;
+            display: grid;
+            grid-template-columns: 150px 1fr 100px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .rel-type {
+            font-weight: 700;
+            color: #764ba2;
+            font-size: 0.95em;
+        }
+
+        .rel-target {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .rel-cardinality {
+            background: #ffeaa7;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            color: #d63031;
+            font-size: 0.9em;
+        }
+
+        .root-hierarchy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 2;
+        }
+
+        .root-element {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .tree-item {
+            margin-left: 20px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .tree-line {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .composition-group {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .composition-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .composed-card {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .composed-name {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .composed-card-arity {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .core-stereotype {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #155724;
+        }
+
+        .core-stereotype-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .example-xml {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .data-flow {
+            background: linear-gradient(90deg, #e8ebff 0%, #f0f2ff 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .data-flow-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .flow-item {
+            padding: 8px 0;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .flow-item::before {
+            content: "▶ ";
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            color: #666;
+            border-top: 2px solid #667eea;
+        }
+
+        .footer-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .attribute, .relationship {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-bar {
+                gap: 5px;
+            }
+
+            .nav-btn {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.composition {
+            background: #e74c3c;
+        }
+
+        .badge.aggregation {
+            background: #f39c12;
+        }
+
+        .badge.trace {
+            background: #9b59b6;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #0c5460;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚁 NDEM Data Model</h1>
+            <p>Complete Class Structure & Object Relationships</p>
+            <div class="info">
+                NIEM-Inspired Drone Data Exchange Model • Multi-UAV Emergency Response
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="showSection('overview')">📋 Overview</button>
+            <button class="nav-btn" onclick="showSection('root')">🔑 Root Message</button>
+            <button class="nav-btn" onclick="showSection('header')">Header</button>
+            <button class="nav-btn" onclick="showSection('identification')">UAV Identification</button>
+            <button class="nav-btn" onclick="showSection('telemetry')">Telemetry</button>
+            <button class="nav-btn" onclick="showSection('sensor')">Sensor Data</button>
+            <button class="nav-btn" onclick="showSection('control')">Command & Control</button>
+            <button class="nav-btn" onclick="showSection('mission')">Mission Data</button>
+            <button class="nav-btn" onclick="showSection('relationships')">All Relationships</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- OVERVIEW SECTION -->
+            <div id="overview" class="section active">
+                <div class="section-title">📋 NDEM Data Model Overview</div>
+
+                <div class="info-box">
+                    The NDEM data model is built on NIEM principles, using <strong>HAS-A composition</strong> relationships to create a semantic data structure for heterogeneous multi-UAV systems. The model follows strict hierarchical composition where complex objects contain and manage their component objects.
+                </div>
+
+                <div class="class-hierarchy">
+                    <div class="root-hierarchy">
+                        <div class="root-element">NDEMMessage (Root)</div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─</span> messageID [1]: EString
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─</span> timestamp [1]: EDate
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─ HAS-A</span> <strong>Header</strong> [1]
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─ HAS-A</span> <strong>UavIdentificationData</strong> [1]
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─ HAS-A</span> <strong>UavTelemetryData</strong> [0..1]
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─ HAS-A</span> <strong>UavSensorData</strong> [0..1]
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">├─ HAS-A</span> <strong>UavCommandAndControlData</strong> [0..1]
+                        </div>
+                        <div class="tree-item">
+                            <span class="tree-line">└─ HAS-A</span> <strong>UavMissionData</strong> [0..1]
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.3em;">Core Concepts</h3>
+
+                <div class="class-card entity">
+                    <div class="class-name">🎯 Composition Pattern (HAS-A)</div>
+                    <div class="class-description">
+                        Objects within NDEMMessage are <strong>composed</strong> rather than referenced. Each parent object owns and manages its child objects. This ensures:
+                        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                            <li><strong>Data Integrity:</strong> Complete object graphs in single messages</li>
+                            <li><strong>Semantic Completeness:</strong> All related data travels together</li>
+                            <li><strong>Protocol Independence:</strong> Transformations handle entire compositions</li>
+                            <li><strong>NIEM Compliance:</strong> Follows national information exchange model principles</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="class-card entity">
+                    <div class="class-name">🏗️ Cardinality Rules</div>
+                    <div class="class-description">
+                        <strong>[1]:</strong> Required - must be present in every message<br/>
+                        <strong>[0..1]:</strong> Optional - may be present depending on message type<br/>
+                        <strong>Nested [0.1]:</strong> Child objects with 0 or 1 instances (scalar composition)
+                    </div>
+                </div>
+
+                <div class="data-flow">
+                    <div class="data-flow-title">📊 Typical Message Data Flow</div>
+                    <div class="flow-item">Fixed-Wing UAV generates observation → Creates UavObservation object</div>
+                    <div class="flow-item">UavObservation composed into UavSensorData</div>
+                    <div class="flow-item">UavSensorData composed into NDEMMessage with complete context</div>
+                    <div class="flow-item">GCS receives complete object graph → Transforms for other systems</div>
+                    <div class="flow-item">DJI SDK receives mapped telemetry → Executes commands</div>
+                </div>
+            </div>
+
+            <!-- ROOT MESSAGE SECTION -->
+            <div id="root" class="section">
+                <div class="section-title">🔑 NDEMMessage - Root Element</div>
+
+                <div class="class-card core">
+                    <div class="class-name">NDEMMessage</div>
+                    <div class="class-stereotype">&lt;&lt;core&gt;&gt; Root container for all NDEM data exchanges</div>
+                    <div class="class-description">
+                        The NDEMMessage is the root element of every NDEM communication. It serves as a container that orchestrates all UAV-related data within a single, coherent message structure. Following NIEM principles, all composite data is owned by this root object.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Direct Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">messageID</div>
+                            <div class="attr-type">String - Unique identifier for message tracing</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">timestamp</div>
+                            <div class="attr-type">DateTime - ISO 8601 format with UTC timezone</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                    </div>
+
+                    <div class="relationships-section">
+                        <div class="attributes-title">Composition Relationships (HAS-A)</div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>Header</strong> - Message routing metadata</div>
+                            <div class="rel-cardinality">[1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavIdentificationData</strong> - Platform metadata</div>
+                            <div class="rel-cardinality">[1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavTelemetryData</strong> - Position, velocity, battery</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavSensorData</strong> - Sensor observations</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavCommandAndControlData</strong> - Control directives</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavMissionData</strong> - Mission parameters</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+                    </div>
+
+                    <div class="example-xml">
+&lt;ndem:NDEMMessage xmlns:ndem="http://finalNedm/1.0"&gt;
+  &lt;messageID&gt;MSG-20240315-UAV001-001&lt;/messageID&gt;
+  &lt;timestamp&gt;2024-03-15T14:30:45Z&lt;/timestamp&gt;
+  
+  &lt;Header&gt;
+    &lt;senderID&gt;FixedWing-MAVLink-001&lt;/senderID&gt;
+    &lt;receiverID&gt;GCS-CommandCenter&lt;/receiverID&gt;
+  &lt;/Header&gt;
+  
+  &lt;UavIdentificationData&gt;
+    &lt;uavID&gt;FW-001&lt;/uavID&gt;
+    &lt;uavManufacturer&gt;3DR&lt;/uavManufacturer&gt;
+    &lt;uavModel&gt;Iris+&lt;/uavModel&gt;
+    &lt;uavType&gt;Fixed-Wing&lt;/uavType&gt;
+    &lt;firmwareVersion&gt;3.9.0&lt;/firmwareVersion&gt;
+  &lt;/UavIdentificationData&gt;
+  
+  &lt;UavTelemetryData&gt;
+    &lt;!-- Composed telemetry objects --&gt;
+  &lt;/UavTelemetryData&gt;
+&lt;/ndem:NDEMMessage&gt;
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEADER SECTION -->
+            <div id="header" class="section">
+                <div class="section-title">Header - Message Routing</div>
+
+                <div class="class-card">
+                    <div class="class-name">Header</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; Message routing and identification</div>
+                    <div class="class-description">
+                        The Header class encapsulates message routing information, defining the source (sender) and destination (receiver) of NDEM messages in the multi-UAV coordination network.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">senderID</div>
+                            <div class="attr-type">String - Source system identifier</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">receiverID</div>
+                            <div class="attr-type">String - Destination system identifier</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Naming Convention for IDs</div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; color: #555; font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.8;">
+                            [PlatformType]-[Protocol]-[Instance]<br/>
+                            <br/>
+                            <strong>Examples:</strong><br/>
+                            • FixedWing-MAVLink-001 (reconnaissance drone)<br/>
+                            • DJI-Quadcopter-Thermal-02 (thermal imaging)<br/>
+                            • Crazyflie-Indoor-03 (indoor exploration)<br/>
+                            • GCS-CommandCenter (ground station)<br/>
+                            • IncidentCommand-SAR (incident command system)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IDENTIFICATION SECTION -->
+            <div id="identification" class="section">
+                <div class="section-title">UavIdentificationData - Platform Metadata</div>
+
+                <div class="class-card entity">
+                    <div class="class-name">UavIdentificationData</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; UAV platform and firmware identification</div>
+                    <div class="class-description">
+                        Encapsulates identifying information about the UAV platform, including manufacturer, model, platform type, and firmware version. This is essential for protocol selection and semantic mapping.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">uavID</div>
+                            <div class="attr-type">String [1] - Unique UAV identifier</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">uavManufacturer</div>
+                            <div class="attr-type">String [1] - Manufacturer name (3DR, DJI, Bitcraze)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">uavModel</div>
+                            <div class="attr-type">String [1] - Platform model (Iris+, Phantom 4, Crazyflie 2.1)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">uavType</div>
+                            <div class="attr-type">String [1] - Aircraft type category</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">firmwareVersion</div>
+                            <div class="attr-type">String [0..1] - Firmware/software version</div>
+                            <div class="attr-card">Optional</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>Role in NDEM:</strong> The identification data is used by the semantic mapping layer to:
+                        <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                            <li>Determine appropriate protocol handlers (MAVLink, DJI SDK, CRTP)</li>
+                            <li>Select correct transformation mappings</li>
+                            <li>Validate platform capabilities against mission requirements</li>
+                            <li>Route to appropriate subsystems</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TELEMETRY SECTION -->
+            <div id="telemetry" class="section">
+                <div class="section-title">UavTelemetryData - Operational State</div>
+
+                <div class="class-card">
+                    <div class="class-name">UavTelemetryData</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; Real-time operational measurements</div>
+                    <div class="class-description">
+                        Contains real-time telemetry measurements including position, velocity, battery status, and flight time. This is a composition of multiple semantic objects (Position, Velocity, Battery, Orientation).
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Direct Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">telemetryTimestamp</div>
+                            <div class="attr-type">Integer [1] - Unix timestamp (milliseconds)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">flightDuration</div>
+                            <div class="attr-type">Integer [1] - Flight time in seconds</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">status</div>
+                            <div class="attr-type">String [1] - Flight status (airborne, landed, critical)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                    </div>
+
+                    <div class="relationships-section">
+                        <div class="attributes-title">Composed Objects</div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavPosition</strong> - GPS coordinates and altitude</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavVelocity</strong> - Speed vectors in 3D</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavBattery</strong> - Power status</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UavPosition -->
+                <div class="composition-group">
+                    <div class="composition-title">🗺️ UavPosition - Geographic Location</div>
+                    <div class="composed-card">
+                        <div class="composed-name">latitude</div>
+                        <div class="composed-card-arity">EDouble [1] - Decimal degrees</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">longitude</div>
+                        <div class="composed-card-arity">EDouble [1] - Decimal degrees</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">altitude</div>
+                        <div class="composed-card-arity">EDouble [1] - Meters above MSL</div>
+                    </div>
+                </div>
+
+                <!-- UavVelocity -->
+                <div class="composition-group">
+                    <div class="composition-title">⚡ UavVelocity - Motion Vectors</div>
+                    <div class="composed-card">
+                        <div class="composed-name">SpeedVelocityX</div>
+                        <div class="composed-card-arity">EDouble [1] - X-axis velocity (m/s)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">SpeedVelocityY</div>
+                        <div class="composed-card-arity">EDouble [1] - Y-axis velocity (m/s)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">SpeedVelocityZ</div>
+                        <div class="composed-card-arity">EDouble [1] - Z-axis velocity (m/s)</div>
+                    </div>
+                </div>
+
+                <!-- UavBattery -->
+                <div class="composition-group">
+                    <div class="composition-title">🔋 UavBattery - Power Status</div>
+                    <div class="composed-card">
+                        <div class="composed-name">BatteryChargevalue</div>
+                        <div class="composed-card-arity">EBigDecimal [1] - Voltage in volts</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">BatteryChargepercent</div>
+                        <div class="composed-card-arity">EInt [1] - Percentage 0-100</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SENSOR DATA SECTION -->
+            <div id="sensor" class="section">
+                <div class="section-title">UavSensorData - Observations & Measurements</div>
+
+                <div class="class-card">
+                    <div class="class-name">UavSensorData</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; Sensor-derived observations</div>
+                    <div class="class-description">
+                        Encapsulates sensor outputs including observation metadata, media references, and thermal/imagery analysis. Composed of observation data and orientation information.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Direct Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">sensorType</div>
+                            <div class="attr-type">String [1] - Sensor modality (thermal, RGB, LiDAR)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">sensorID</div>
+                            <div class="attr-type">String [1] - Sensor instance identifier</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                    </div>
+
+                    <div class="relationships-section">
+                        <div class="attributes-title">Composed Objects</div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>UavObservation</strong> - Detected objects and analysis</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UavObservation -->
+                <div class="composition-group">
+                    <div class="composition-title">👁️ UavObservation - Detected Objects</div>
+                    
+                    <div class="composed-card">
+                        <div class="composed-name">observationID</div>
+                        <div class="composed-card-arity">EInt [1] - Unique observation identifier</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">TimeStamp</div>
+                        <div class="composed-card-arity">EDate [1] - Observation timestamp</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">MediaURL</div>
+                        <div class="composed-card-arity">EString [1] - Reference to sensor media (image/video)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">locationofObservation</div>
+                        <div class="composed-card-arity">EString [1] - Description of observed location</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">uavOrientation</div>
+                        <div class="composed-card-arity">UavOrientation [0..1] - Sensor orientation at time of observation</div>
+                    </div>
+
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ffc107;">
+                        <div style="font-weight: 700; color: #856404; margin-bottom: 10px; font-size: 0.95em;">Nested: UavOrientation</div>
+                        <div class="attribute" style="background: white; border-left: 3px solid #ffc107; margin-bottom: 8px;">
+                            <div class="attr-name">OrientationPitch</div>
+                            <div class="attr-type">EDouble [1] - Pitch angle (degrees)</div>
+                        </div>
+                        <div class="attribute" style="background: white; border-left: 3px solid #ffc107; margin-bottom: 8px;">
+                            <div class="attr-name">OrientationYaw</div>
+                            <div class="attr-type">EDouble [1] - Yaw angle (degrees)</div>
+                        </div>
+                        <div class="attribute" style="background: white; border-left: 3px solid #ffc107;">
+                            <div class="attr-name">OrientationRoll</div>
+                            <div class="attr-type">EDouble [1] - Roll angle (degrees)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROL SECTION -->
+            <div id="control" class="section">
+                <div class="section-title">UavCommandAndControlData - Mission Directives</div>
+
+                <div class="class-card">
+                    <div class="class-name">UavCommandAndControlData</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; Mission control parameters and directives</div>
+                    <div class="class-description">
+                        Contains command and control parameters for directing UAV operations. Includes target location references and timing information. Only present when mission control is actively directing the UAV.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Direct Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">commandType</div>
+                            <div class="attr-type">String [1] - Command category (navigate, observe, wait)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">commandStatus</div>
+                            <div class="attr-type">String [1] - Execution status (pending, executing, complete)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">commandID</div>
+                            <div class="attr-type">String [0..1] - Unique command identifier</div>
+                            <div class="attr-card">Optional</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">issueTime</div>
+                            <div class="attr-type">EDate [0..1] - When command was issued</div>
+                            <div class="attr-card">Optional</div>
+                        </div>
+                    </div>
+
+                    <div class="relationships-section">
+                        <div class="attributes-title">Referenced Objects</div>
+
+                        <div class="relationship">
+                            <div class="rel-type">REFERENCES</div>
+                            <div class="rel-target"><strong>TargetLocation</strong> - Where to navigate or observe</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TargetLocation -->
+                <div class="core-stereotype">
+                    <div class="core-stereotype-title">📍 TargetLocation - Destination Coordinates</div>
+                    <div style="margin-bottom: 10px; font-size: 0.95em; line-height: 1.6;">
+                        <strong>Stereotype:</strong> &lt;&lt;core&gt;&gt; Location (ncLocationType) in NIEM<br/>
+                        <strong>Purpose:</strong> Specifies geographic coordinates for navigation targets
+                    </div>
+                    <div class="attribute" style="background: rgba(0,0,0,0.05); border-left: 3px solid #27ae60; margin-bottom: 8px;">
+                        <div class="attr-name">latitude</div>
+                        <div class="attr-type">EDouble [1] - Decimal degrees</div>
+                    </div>
+                    <div class="attribute" style="background: rgba(0,0,0,0.05); border-left: 3px solid #27ae60; margin-bottom: 8px;">
+                        <div class="attr-name">longitude</div>
+                        <div class="attr-type">EDouble [1] - Decimal degrees</div>
+                    </div>
+                    <div class="attribute" style="background: rgba(0,0,0,0.05); border-left: 3px solid #27ae60;">
+                        <div class="attr-name">altitude</div>
+                        <div class="attr-type">EDouble [1] - Meters above MSL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MISSION DATA SECTION -->
+            <div id="mission" class="section">
+                <div class="section-title">UavMissionData - Mission Parameters</div>
+
+                <div class="class-card">
+                    <div class="class-name">UavMissionData</div>
+                    <div class="class-stereotype">&lt;&lt;dataType&gt;&gt; Mission profile and constraints</div>
+                    <div class="class-description">
+                        Describes the overall mission context, type, and operational constraints. Contains mission-level parameters and operational boundaries for the UAV.
+                    </div>
+
+                    <div class="attributes-section">
+                        <div class="attributes-title">Direct Attributes</div>
+                        <div class="attribute">
+                            <div class="attr-name">missionType</div>
+                            <div class="attr-type">String [1] - Mission category (SAR, surveillance, mapping)</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                        <div class="attribute">
+                            <div class="attr-name">missionArea</div>
+                            <div class="attr-type">String [1] - Geographic description of mission area</div>
+                            <div class="attr-card">Required</div>
+                        </div>
+                    </div>
+
+                    <div class="relationships-section">
+                        <div class="attributes-title">Composed Objects</div>
+
+                        <div class="relationship">
+                            <div class="rel-type">HAS-A</div>
+                            <div class="rel-target"><strong>MissionConstraints</strong> - Operational limits</div>
+                            <div class="rel-cardinality">[0..1]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MissionConstraints -->
+                <div class="composition-group">
+                    <div class="composition-title">⚙️ MissionConstraints - Operational Limits</div>
+                    <div class="composed-card">
+                        <div class="composed-name">controlMeasuretype</div>
+                        <div class="composed-card-arity">EString [1] - Type of constraint (altitude, speed)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">minAltitude</div>
+                        <div class="composed-card-arity">EDouble [0..1] - Minimum altitude (meters)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">maxAltitude</div>
+                        <div class="composed-card-arity">EDouble [0..1] - Maximum altitude (meters)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">minSpeed</div>
+                        <div class="composed-card-arity">EDouble [0..1] - Minimum speed (m/s)</div>
+                    </div>
+                    <div class="composed-card">
+                        <div class="composed-name">maxSpeed</div>
+                        <div class="composed-card-arity">EDouble [0..1] - Maximum speed (m/s)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RELATIONSHIPS SECTION -->
+            <div id="relationships" class="section">
+                <div class="section-title">Complete Object Relationships</div>
+
+                <div class="info-box">
+                    This section shows all HAS-A and composition relationships in the NDEM model, following NIEM principles where child objects are owned and managed by their parent containers.
+                </div>
+
+                <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.3em;">Relationship Hierarchy</h3>
+
+                <div class="class-card">
+                    <div class="class-name">Composition Tree</div>
+                    <div style="margin-top: 20px; font-family: 'Courier New', monospace; line-height: 2; font-size: 0.95em; color: #555;">
+                        <div><strong>NDEMMessage (Root)</strong></div>
+                        <div style="margin-left: 20px; color: #667eea;">
+                            ├─ Header<br/>
+                            │  ├─ senderID<br/>
+                            │  └─ receiverID<br/>
+                        </div>
+                        <div style="margin-left: 20px; color: #667eea;">
+                            ├─ UavIdentificationData<br/>
+                            │  ├─ uavID<br/>
+                            │  ├─ uavManufacturer<br/>
+                            │  ├─ uavModel<br/>
+                            │  ├─ uavType<br/>
+                            │  └─ firmwareVersion<br/>
+                        </div>
+                        <div style="margin-left: 20px; color: #e74c3c;">
+                            ├─ UavTelemetryData (optional)<br/>
+                            │  ├─ telemetryTimestamp<br/>
+                            │  ├─ flightDuration<br/>
+                            │  ├─ status<br/>
+                            │  ├─ UavPosition<br/>
+                            │  │  ├─ latitude<br/>
+                            │  │  ├─ longitude<br/>
+                            │  │  └─ altitude<br/>
+                            │  ├─ UavVelocity<br/>
+                            │  │  ├─ SpeedVelocityX<br/>
+                            │  │  ├─ SpeedVelocityY<br/>
+                            │  │  └─ SpeedVelocityZ<br/>
+                            │  └─ UavBattery<br/>
+                            │     ├─ BatteryChargevalue<br/>
+                            │     └─ BatteryChargepercent<br/>
+                        </div>
+                        <div style="margin-left: 20px; color: #e74c3c;">
+                            ├─ UavSensorData (optional)<br/>
+                            │  ├─ sensorType<br/>
+                            │  ├─ sensorID<br/>
+                            │  └─ UavObservation<br/>
+                            │     ├─ observationID<br/>
+                            │     ├─ TimeStamp<br/>
+                            │     ├─ MediaURL<br/>
+                            │     ├─ locationofObservation<br/>
+                            │     └─ UavOrientation<br/>
+                            │        ├─ OrientationPitch<br/>
+                            │        ├─ OrientationYaw<br/>
+                            │        └─ OrientationRoll<br/>
+                        </div>
+                        <div style="margin-left: 20px; color: #e74c3c;">
+                            ├─ UavCommandAndControlData (optional)<br/>
+                            │  ├─ commandType<br/>
+                            │  ├─ commandStatus<br/>
+                            │  ├─ commandID<br/>
+                            │  ├─ issueTime<br/>
+                            │  └─ TargetLocation (reference)<br/>
+                            │     ├─ latitude<br/>
+                            │     ├─ longitude<br/>
+                            │     └─ altitude<br/>
+                        </div>
+                        <div style="margin-left: 20px; color: #e74c3c;">
+                            └─ UavMissionData (optional)<br/>
+                               ├─ missionType<br/>
+                               ├─ missionArea<br/>
+                               └─ MissionConstraints<br/>
+                                  ├─ controlMeasuretype<br/>
+                                  ├─ minAltitude<br/>
+                                  ├─ maxAltitude<br/>
+                                  ├─ minSpeed<br/>
+                                  └─ maxSpeed<br/>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.3em;">Cardinality Semantics</h3>
+
+                <div class="class-card">
+                    <div class="class-name">Understanding Cardinality Markers</div>
+                    <div class="attribute" style="margin-bottom: 12px;">
+                        <div class="attr-name">[1]</div>
+                        <div class="attr-type" style="grid-column: 2 / 3;">Required - Must be present in every message. Parent object is invalid without this child.</div>
+                    </div>
+                    <div class="attribute" style="margin-bottom: 12px;">
+                        <div class="attr-name">[0..1]</div>
+                        <div class="attr-type" style="grid-column: 2 / 3;">Optional - May or may not be present depending on message context. If present, exactly one instance.</div>
+                    </div>
+                    <div class="attribute" style="margin-bottom: 12px;">
+                        <div class="attr-name">[0.1]</div>
+                        <div class="attr-type" style="grid-column: 2 / 3;">Scalar Optional - At most one instance of this component within parent.</div>
+                    </div>
+                </div>
+
+                <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.3em;">Core NIEM-Inspired Types</h3>
+
+                <div class="core-stereotype">
+                    <div class="core-stereotype-title">Entity & Location Core Types</div>
+                    <div style="margin-top: 10px; line-height: 1.8; font-size: 0.95em;">
+                        <strong>&lt;&lt;core&gt;&gt; Entity (ncEntity):</strong> Represents physical or logical device/person. Used by UAVs and organizational entities.<br/>
+                        <br/>
+                        <strong>&lt;&lt;core&gt;&gt; Location (ncLocationType):</strong> Represents geographic location with coordinates. Used by TargetLocation and UavPosition.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-title">NDEM Data Model Documentation</div>
+            <p>Complete object-oriented model for heterogeneous multi-UAV emergency response</p>
+            <p>Built on NIEM principles with HAS-A composition relationships</p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">Namespace: http://finalNedm/1.0 | Version 2.0</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Set first button as active on load
+        document.querySelector('.nav-btn').classList.add('active');
+    </script>
+</body>
+</html>
